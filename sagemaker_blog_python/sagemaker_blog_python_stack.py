@@ -4,7 +4,6 @@ from aws_cdk import (
     aws_sagemaker_alpha as sagemaker,
     aws_s3 as s3,
     aws_ecr as ecr,
-    aws_ec2 as ec2
 )
 from constructs import Construct
 
@@ -34,7 +33,7 @@ class SagemakerBlogPythonStack(Stack):
                                                        sagemaker.InstanceProductionVariantProps(
                                                            model=model,
                                                            variant_name=variant_name,
-                                                           instance_type=ec2.InstanceType("ml.g4dn.xlarge",),
+                                                           instance_type=sagemaker.InstanceType("ml.g4dn.xlarge",),
                                                        )
                                                    ]
                                                    )
