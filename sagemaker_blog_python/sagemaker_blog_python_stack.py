@@ -38,8 +38,13 @@ class SagemakerBlogPythonStack(Stack):
                                                 iam.PolicyStatement(
                                                     actions=[
                                                         "sagemaker:*",
-                                                        "s3:*",
-                                                        "ecr:*",
+                                                        "s3:Get*",
+                                                        "s3:List*",
+                                                        "s3:Put*",
+                                                        "ecr:GetAuthorizationToken",
+                                                        "ecr:BatchCheckLayerAvailability",
+                                                        "ecr:GetDownloadUrlForLayer",
+                                                        "ecr:BatchGetImage"
                                                     ],
                                                     resources=["*"]
                                                 )]
@@ -54,7 +59,7 @@ class SagemakerBlogPythonStack(Stack):
                                                        sagemaker.InstanceProductionVariantProps(
                                                            model=model,
                                                            variant_name=variant_name,
-                                                           instance_type=sagemaker.InstanceType("ml.g4dn.xlarge",),
+                                                           instance_type=sagemaker.InstanceType("ml.g4dn.xlarge", ),
                                                        )
                                                    ]
                                                    )
