@@ -4,6 +4,7 @@ from aws_cdk import (
     aws_sagemaker_alpha as sagemaker,
     aws_s3 as s3,
     aws_ecr as ecr,
+    aws_iam as iam
 )
 from constructs import Construct
 
@@ -13,8 +14,9 @@ class SagemakerBlogPythonStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        bucket = s3.Bucket(self, "huggingface-sagemaker-models")
-        model_data = sagemaker.ModelData.from_bucket(bucket, "transformers/4.12.3/pytorch/1.9.1/gpt-j/model.tar.gz")
+        # bucket = s3.Bucket(self, "huggingface-sagemaker-models")
+        bucket = s3.Bucket.from_bucket_name(self, "Bucket", "sagemaker-studio-emje97blvoj")
+        model_data = sagemaker.ModelData.from_bucket(bucket, "gpt-j/model.tar.gz")
         repository = ecr.Repository.from_repository_arn(self, "EcrRepo",
                                                         repository_arn="arn:aws:ecr:us-west-2:763104351884:repository"
                                                                        "/huggingface-pytorch-inference")
@@ -25,7 +27,26 @@ class SagemakerBlogPythonStack(Stack):
                                 containers=[sagemaker.ContainerDefinition(
                                     image=image,
                                     model_data=model_data
-                                )])
+                                )],
+                                role=iam.Role(
+                                    scope=self,
+                                    id="ModelRole",
+                                    role_name="ModelRole",
+                                    inline_policies={
+                                        "ModelPolicy": iam.PolicyDocument(
+                                            statements=[
+                                                iam.PolicyStatement(
+                                                    actions=[
+                                                        "sagemaker:*",
+                                                        "s3:*",
+                                                        "ecr:*",
+                                                    ],
+                                                    resources=["*"]
+                                                )]
+                                        )
+                                    },
+                                    assumed_by=iam.ServicePrincipal("sagemaker.amazonaws.com"),
+                                ))
 
         variant_name = "my-variant"
         endpoint_config = sagemaker.EndpointConfig(self, "EndpointConfig",
