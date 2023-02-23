@@ -1,11 +1,9 @@
 from aws_cdk import (
     # Duration,
     Stack,
-    # aws_sqs as sqs,
-    # aws_iam as iam,
-    # aws_sns as sns,
     aws_sagemaker_alpha as sagemaker,
-
+    aws_s3 as s3,
+    aws_ecr as ecr
 )
 from constructs import Construct
 import pathlib as path
@@ -16,10 +14,13 @@ class SagemakerBlogPythonStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # The code that defines your stack goes here
-
-        image = sagemaker.ContainerImage.from_asset("path/to/Dockerfile/directory")
-        model_data = sagemaker.ModelData.from_asset("path/to/artifact/file.tar.gz")
+        bucket = s3.Bucket(self, "huggingface-sagemaker-models")
+        model_data = sagemaker.ModelData.from_bucket(bucket, "transformers/4.12.3/pytorch/1.9.1/gpt-j/model.tar.gz")
+        repository = ecr.Repository.from_repository_arn(self, "EcrRepo",
+                                                        repository_arn="arn:aws:ecr:us-west-2:763104351884:repository"
+                                                                       "/huggingface-pytorch-inference")
+        image = sagemaker.ContainerImage.from_ecr_repository(repository, "1.9.1-transformers4.12.3-gpu-py38-cu111"
+                                                                         "-ubuntu20.04")
 
         model = sagemaker.Model(self, "PrimaryContainerModel",
                                 containers=[sagemaker.ContainerDefinition(
