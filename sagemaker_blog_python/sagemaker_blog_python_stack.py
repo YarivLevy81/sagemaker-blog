@@ -3,10 +3,10 @@ from aws_cdk import (
     Stack,
     aws_sagemaker_alpha as sagemaker,
     aws_s3 as s3,
-    aws_ecr as ecr
+    aws_ecr as ecr,
+    aws_ec2 as ec2
 )
 from constructs import Construct
-import pathlib as path
 
 
 class SagemakerBlogPythonStack(Stack):
@@ -33,7 +33,8 @@ class SagemakerBlogPythonStack(Stack):
                                                    instance_production_variants=[
                                                        sagemaker.InstanceProductionVariantProps(
                                                            model=model,
-                                                           variant_name=variant_name
+                                                           variant_name=variant_name,
+                                                           instance_type=ec2.InstanceType("ml.g4dn.xlarge",),
                                                        )
                                                    ]
                                                    )
