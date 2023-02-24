@@ -1,7 +1,7 @@
 
-# Welcome to your CDK Python project!
+# SageMaker GPT-J Endpoint with CDK 
 
-This is a blank project for CDK development with Python.
+This is a CDK implementation of an Amazon SageMaker Model and Endpoint of GPT-J.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
